@@ -114,10 +114,10 @@ public class CalculatorView extends PolymerTemplate<CalculatorView.CalculatorVie
     private void calculate(){
         if(!arkBalance.isEmpty() && this.selectedDelegate != null){
             boolean isVotedForDelegate = isVoted.getValue();
-            double arkShare = (float) (422 * 0.75);
+            double arkShare = (float) (422 * selectedDelegate.getPayout_percent() / 100 );
             String votingWeightStr = this.selectedDelegate.getDelegateStatistics().getVoting_power();
-            long convertedNumber = votingWeightStr == null || votingWeightStr.isEmpty() ? 0 : Long.parseLong(votingWeightStr);
-            double votingWeight = Math.round(convertedNumber/ 100000000F);
+            long convertedVotingWeightNumber = votingWeightStr == null || votingWeightStr.isEmpty() ? 0 : Long.parseLong(votingWeightStr);
+            double votingWeight = Math.round(convertedVotingWeightNumber/ 100000000F);
             double inDelegateShare = (votingWeight + (isVotedForDelegate ? 0 : arkBalance.getValue())) / arkBalance.getValue();
 
             getModel().setArkPerDay(arkShare / inDelegateShare);
