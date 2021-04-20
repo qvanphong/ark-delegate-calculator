@@ -1,11 +1,12 @@
 import {html, PolymerElement} from '@polymer/polymer/polymer-element.js';
-import '@vaadin/vaadin-ordered-layout/src/vaadin-horizontal-layout.js';
 import '@vaadin/vaadin-text-field/src/vaadin-number-field.js';
-import '@vaadin/vaadin-form-layout/src/vaadin-form-layout.js';
 import '@vaadin/vaadin-checkbox/src/vaadin-checkbox.js';
 import '@vaadin/vaadin-grid/src/vaadin-grid.js';
-import '@vaadin/vaadin-form-layout/src/vaadin-form-item.js';
 import '@vaadin/vaadin-ordered-layout/src/vaadin-vertical-layout.js';
+import '@vaadin/vaadin-combo-box/src/vaadin-combo-box.js';
+import '@vaadin/vaadin-ordered-layout/src/vaadin-horizontal-layout.js';
+import '@vaadin/vaadin-form-layout/src/vaadin-form-layout.js';
+import '@vaadin/vaadin-form-layout/src/vaadin-form-item.js';
 
 class CalculatorView extends PolymerElement {
 
@@ -16,42 +17,56 @@ class CalculatorView extends PolymerElement {
                     display: block;
                     height: 100%;
                 }
-    
+                
+                @media only screen and (min-width: 0px) {
+                    #container {
+                        width: 90%;
+                    }
+                }
+                
+                @media only screen and (min-width: 550px) {
+                    #container {
+                        width: 35%;
+                    }
+                }
+
                 .bold {
                     font-weight: bold;
                 }
-    
+
+                .combobox-cell-mobile {
+                    font-size: var(--lumo-font-size-xs);
+                }
+
                 .fake-ark-icon {
                     color: var(--lumo-error-color);
                 }
-    
-                #notification-text{
+
+                #notification-text {
                     font-size: var(--lumo-font-size-xs);
                     text-decoration: italic;
                 }
             </style>
-<vaadin-horizontal-layout class="content" style="width: 100%; height: 100%;">
- <vaadin-vertical-layout theme="spacing" style="flex-grow: 1; width: 60%; margin: var(--lumo-space-m);">
-  <h2>ARK Delegates Selector</h2>
-  <vaadin-grid id="delegate-grid"></vaadin-grid>
- </vaadin-vertical-layout>
- <vaadin-vertical-layout theme="spacing" style="flex-grow: 0; width: 40%; margin: var(--lumo-space-m);">
+<vaadin-horizontal-layout class="content" style="width: 100%; height: 100%; justify-content: center;">
+ <vaadin-vertical-layout theme="spacing" style="flex-grow: 0; margin: var(--lumo-space-m); flex-shrink: 0; flex-direction: column;" id="container">
   <vaadin-vertical-layout theme="spacing" style="width: 100%;">
-   <h2 style="margin-bottom: var(--lumo-space-xs);">ARK Delegate Calculator</h2>
+   <vaadin-horizontal-layout theme="spacing" style="align-items: center;">
+    <img style="width: auto; height: 38px;" src="https://ark.io/images/logo.svg">
+    <h2 style="margin-bottom: var(--lumo-space-xs); margin: 0; padding: 0; margin-left: var(--lumo-space-m);"> ARK Delegate Calculator</h2>
+   </vaadin-horizontal-layout>
    <vaadin-horizontal-layout style="width: 100%; align-items: flex-end;" theme="spacing-xl">
     <vaadin-number-field style="flex-grow: 1;" label="ARK Balance:" id="ark-balance">
-     <span slot="prefix" class="bold">ARK</span>
      <span slot="suffix" class="bold">Ѧ</span>
     </vaadin-number-field>
-    <vaadin-checkbox style="flex-grow: 1;" id="is-voted">
-      I voted this delegate 
+    <vaadin-checkbox style="flex-grow: 0;" id="is-voted">
+      Voted 
     </vaadin-checkbox>
    </vaadin-horizontal-layout>
-   <i id="notification-text">{{notification}}</i>
+   <vaadin-combo-box id="delegate-list" style="width: 100%;" label="Delegate"></vaadin-combo-box>
   </vaadin-vertical-layout>
   <vaadin-vertical-layout style="margin-top: var(--lumo-space-xl); width: 100%;">
    <h2 style="flex-shrink: 0;">Profit</h2>
-   <vaadin-form-layout style="width: 100%;" id="profit-form">
+   <vaadin-form-layout id="profit-form" style="flex-shrink: 0;">
     <vaadin-form-item>
      <label slot="label">ARK/Day</label>
      <label>~</label>
@@ -93,10 +108,6 @@ class CalculatorView extends PolymerElement {
 
     static get properties() {
         return {
-            notification: {
-                type: String,
-                value: 'Input your ARK balance then select which delegate you want to stake with.',
-            },
             arkPerDay: Number,
             arkPerMonth: Number,
             arkPerYear: Number,
@@ -106,11 +117,8 @@ class CalculatorView extends PolymerElement {
 
     ready() {
         super.ready();
-        // const calculateForm = this.$['calculate-form'];
         const profitForm = this.$['profit-form'];
         const formResponsiveSteps = [{minWidth: 0, columns: 1}];
-
-        // calculateForm.responsiveSteps = formResponsiveSteps;
         profitForm.responsiveSteps = formResponsiveSteps;
     }
 }
