@@ -32,7 +32,7 @@ import tech.qvanphong.arkdc.services.ArkDelegatesService;
 @Route("")
 @PageTitle("ARK Delegate Calculator")
 @Viewport("width=device-width, initial-scale=1.0")
-@PWA(display = "standalone", name = "ARK Delegate Calculator", shortName = "DelegateCalculator", iconPath = "icons/favicon.png")
+@PWA(display = "standalone", name = "ARK Delegate Calculator", shortName = "ARK Delegate", iconPath = "icons/favicon.png")
 public class CalculatorView extends PolymerTemplate<CalculatorView.CalculatorViewModel> {
 
     @Id("ark-balance")
