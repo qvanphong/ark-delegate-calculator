@@ -14,7 +14,7 @@ public class DelegateStatistics{
 		 this.delegate_id = delegate_id; } 
     int delegate_id;
     @JsonProperty("voters") 
-    public int getVoters() { 
+    public int getVoters() {
 		 return this.voters; } 
     public void setVoters(int voters) { 
 		 this.voters = voters; } 

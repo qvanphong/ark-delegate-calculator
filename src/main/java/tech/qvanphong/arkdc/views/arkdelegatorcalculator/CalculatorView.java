@@ -1,30 +1,21 @@
 package tech.qvanphong.arkdc.views.arkdelegatorcalculator;
 
-import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Html;
-import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Hr;
 import com.vaadin.flow.component.html.Span;
-import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.orderedlayout.FlexComponent;
-import com.vaadin.flow.component.orderedlayout.FlexLayout;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.page.Viewport;
 import com.vaadin.flow.component.template.Id;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
+import com.vaadin.flow.data.renderer.TemplateRenderer;
 import com.vaadin.flow.dom.Element;
-import com.vaadin.flow.function.SerializableFunction;
-import com.vaadin.flow.router.AfterNavigationEvent;
-import com.vaadin.flow.router.AfterNavigationObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.PWA;
 import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.server.WebBrowser;
 import com.vaadin.flow.templatemodel.TemplateModel;
@@ -34,20 +25,15 @@ import com.vaadin.flow.component.polymertemplate.PolymerTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import tech.qvanphong.arkdc.models.Datum;
-import tech.qvanphong.arkdc.services.ArkDelegatesAPI;
+import tech.qvanphong.arkdc.services.ArkDelegatesService;
 
-/**
- * A Designer generated component for the calculator-view template.
- * <p>
- * Designer will add and remove fields with @Id mappings but
- * does not overwrite or otherwise change this file.
- */
 @Tag("calculator-view")
 @JsModule("./views/calculator/calculator-view.js")
 @Route("")
 @PageTitle("ARK Delegate Calculator")
 @Viewport("width=device-width, initial-scale=1.0")
-public class CalculatorView extends PolymerTemplate<CalculatorView.CalculatorViewModel> implements AfterNavigationObserver {
+@PWA(display = "standalone", name = "ARK Delegate Calculator", shortName = "DelegateCalculator", iconPath = "icons/favicon.png")
+public class CalculatorView extends PolymerTemplate<CalculatorView.CalculatorViewModel> {
 
     @Id("ark-balance")
     private NumberField arkBalance;
@@ -56,46 +42,53 @@ public class CalculatorView extends PolymerTemplate<CalculatorView.CalculatorVie
     @Id("delegate-list")
     private ComboBox<Datum> delegateList;
 
-    private ArkDelegatesAPI delegatesAPI;
+    private ArkDelegatesService delegatesService;
     private Datum selectedDelegate;
 
 
     @Autowired
-    public CalculatorView(ArkDelegatesAPI delegatesAPI) {
-        this.delegatesAPI = delegatesAPI;
+    public CalculatorView(ArkDelegatesService delegatesService) {
+        this.delegatesService = delegatesService;
         initDelegateListComboBox();
-        arkBalance.addValueChangeListener(event -> calculate());
-        isVoted.addValueChangeListener(event -> calculate());
+        arkBalance.addValueChangeListener(event -> updateCalculateUI());
+        isVoted.addValueChangeListener(event -> updateCalculateUI());
     }
 
     private void initDelegateListComboBox() {
         WebBrowser browser = VaadinSession.getCurrent().getBrowser();
         delegateList.setItemLabelGenerator(Datum::getName);
+        delegateList.setItems(delegatesService.get51Delegates());
         delegateList.addValueChangeListener(event -> {
             this.selectedDelegate = event.getValue();
-            calculate();
+            updateCalculateUI();
+            updateDelegateInformationUI(event.getValue());
         });
+        // Alternative way because there is a bug on Responsive Step of Form Layout when wrapped inside ComboBox
         delegateList.setRenderer(browser.isAndroid() || browser.isIPhone() || browser.isWindowsPhone() ?
                 createMobileDelegateListComboBox() : createDesktopDelegateListComboBox());
     }
 
-    private ComponentRenderer<HorizontalLayout, Datum> createDesktopDelegateListComboBox() {
+    private ComponentRenderer<FormLayout, Datum> createDesktopDelegateListComboBox() {
         return new ComponentRenderer<>(delegate -> {
-            HorizontalLayout container = new HorizontalLayout();
-            Span delegateNameWithRank = new Span(delegate.getName());
-            Element subRanking = new Html("<sup style='color: var(--lumo-error-color)'>" + delegate.getRank() + "</sup>").getElement();
-            delegateNameWithRank.getElement().appendChild(subRanking);
-
-            Component delegateName = createCellContent("Name", delegateNameWithRank);
-            Component shares = createCellContent("Shares", delegate.getPayout_percent());
             String formattedWeight = String.format("%.2f", Long.parseLong(delegate.getDelegateStatistics().getVoting_power()) / 100000000F);
-            Component voteWeight = createCellContent("Vote weight", formattedWeight);
 
-            container.add(delegateName, shares, voteWeight);
-            container.setFlexGrow(1, delegateName);
-            container.setFlexGrow(0, shares);
-            container.setFlexGrow(1, voteWeight);
-            return container;
+            Element subRanking = new Html("<sup style='color: var(--lumo-error-color)'>" + delegate.getRank() + "</sup>").getElement();
+            Span delegateNameWithRank = new Span(delegate.getName());
+            delegateNameWithRank.getElement().appendChild(subRanking);
+            Span payout = new Span(String.valueOf(delegate.getPayout_percent()));
+            Span voteWeight = new Span(formattedWeight);
+
+            delegateNameWithRank.setId("content-s");
+            payout.setId("content-s");
+            voteWeight.setId("content-s");
+
+            FormLayout formLayout = new FormLayout();
+            formLayout.setResponsiveSteps(new FormLayout.ResponsiveStep("0px", 3, FormLayout.ResponsiveStep.LabelsPosition.TOP));
+            formLayout.addFormItem(delegateNameWithRank, "Name");
+            formLayout.addFormItem(payout, "Shares");
+            formLayout.addFormItem(voteWeight, "Vote weight");
+
+            return formLayout;
         });
     }
 
@@ -117,7 +110,28 @@ public class CalculatorView extends PolymerTemplate<CalculatorView.CalculatorVie
         });
     }
 
-    private void calculate() {
+
+    private void updateDelegateInformationUI(Datum delegate) {
+        String votingPowerStr = delegate.getDelegateStatistics().getVoting_power();
+        String minPayStr = delegate.getPayout_minimum();
+        double votingWeight = votingPowerStr == null || votingPowerStr.isEmpty() ? 0 : Double.parseDouble(votingPowerStr) / 100000000;
+        votingWeight = Math.round(votingWeight);
+        double minPay = minPayStr == null || minPayStr.isEmpty() ? 0 : Double.parseDouble(minPayStr) / 100000000;
+        getModel().setDelegateName(delegate.getName());
+        getModel().setDelegateRank(delegate.getRank());
+        getModel().setDelegateVoter(delegate.getDelegateStatistics().getVoters());
+        getModel().setDelegateVoteWeight(votingWeight);
+        getModel().setDelegateMinPay(minPay);
+        getModel().setDelegatePayInterval(delegate.getPayout_interval() + "h");
+        getModel().setDelegateWebsite(delegate.getWebsite());
+        getModel().setDelegateDetailLink(delegatesService.getDelegateLiveUrl() + "delegate/" + delegate.getSlug());
+        String icon = delegate.getContribution_status().equals("inactive") ?
+                "vaadin:ellipsis-circle" : delegate.getContribution_status().equals("active") ? "check-circle" : "vaadin:close-circle";
+        getModel().setContributeIcon("vaadin:" + icon);
+        getModel().setContributeClass(delegate.getContribution_status());
+    }
+
+    private void updateCalculateUI() {
         if (!arkBalance.isEmpty() && this.selectedDelegate != null) {
             boolean isVotedForDelegate = isVoted.getValue();
             double arkShare = (float) (422 * selectedDelegate.getPayout_percent() / 100);
@@ -133,31 +147,6 @@ public class CalculatorView extends PolymerTemplate<CalculatorView.CalculatorVie
         }
     }
 
-    private Component createCellContent(String title, Object content) {
-        return createCellContent(title, content, null);
-    }
-
-    private Component createCellContent(String title, Object content, String width) {
-        Span shares = new Span(title);
-        shares.getElement().getStyle().set("font-weight", "500");
-        Component contentComponent = content == null ?
-                new Span() :
-                (content instanceof Component) ? (Component) content : new Span(content.toString());
-
-        VerticalLayout container = new VerticalLayout();
-        if (width != null) container.setWidth(width);
-        container.setSpacing(false);
-//        container.setAlignItems(FlexComponent.Alignment.CENTER);
-        container.getThemeList().add("spacing-xs");
-        container.add(shares, contentComponent);
-        return container;
-    }
-
-    @Override
-    public void afterNavigation(AfterNavigationEvent afterNavigationEvent) {
-        delegateList.setItems(delegatesAPI.get51Delegates());
-    }
-
     public interface CalculatorViewModel extends TemplateModel {
         void setArkPerDay(double value);
 
@@ -167,5 +156,24 @@ public class CalculatorView extends PolymerTemplate<CalculatorView.CalculatorVie
 
         void setArkPerYear(double value);
 
+        void setDelegateName(String value);
+
+        void setDelegateRank(int value);
+
+        void setDelegateVoter(double value);
+
+        void setDelegateVoteWeight(double value);
+
+        void setDelegateMinPay(double value);
+
+        void setDelegatePayInterval(String value);
+
+        void setContributeIcon(String value);
+
+        void setDelegateWebsite(String value);
+
+        void setDelegateDetailLink(String value);
+
+        void setContributeClass(String value);
     }
 }
