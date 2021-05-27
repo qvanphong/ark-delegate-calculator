@@ -24,6 +24,9 @@ public class ArkDelegatesService {
     @Value("${delegateLivesUrl}")
     private String delegateLiveUrl;
 
+    @Value("${delegateDetailUrl}")
+    private String delegateDetailUrl;
+
     public List<Datum> get51Delegates() {
         if (delegates == null || delegates.isEmpty()) {
             setDelegates(fetch51Delegates());
@@ -53,4 +56,7 @@ public class ArkDelegatesService {
         return root == null || root.getData() == null ? new ArrayList<>() : root.getData();
     }
 
+    public String getDelegateDetailUrl() {
+        return delegateDetailUrl;
+    }
 }
