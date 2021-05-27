@@ -21,9 +21,23 @@ class CalculatorView extends PolymerElement {
                     color: var(--lumo-contrast);
                     margin-left: auto;
                 }
+    
+                @media screen and (min-width: 770px) {
+                    #container {
+                        width: 50%;
+
+                    }
+                }
+
+                @media screen and (max-width: 769px) {
+                    #container {
+                        width: 100%
+
+                    }
+                }
             </style>
 <vaadin-horizontal-layout class="content" style="width: 100%; height: 100%; justify-content: center;">
- <vaadin-vertical-layout theme="spacing" style="width: 50%" id="container">
+ <vaadin-vertical-layout theme="spacing" style="padding: var(--lumo-space-s)" id="container">
   <vaadin-vertical-layout style="width: 100%" theme="spacing">
    <vaadin-horizontal-layout theme="spacing" style="align-items: center; width: 100%">
     <img style="width: auto; height: 38px;" src="https://ark.io/images/logo.svg">

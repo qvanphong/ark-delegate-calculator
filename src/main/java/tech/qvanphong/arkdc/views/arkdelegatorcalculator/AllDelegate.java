@@ -74,19 +74,23 @@ public class AllDelegate extends PolymerTemplate<AllDelegate.AllDelegateModel> {
             if (arkBalance == null || arkBalance == 0) {
                 return new Span();
             }
-            String rewardAmount = String.format("%.2f", StakeCalculator.calculateStake(arkBalance, datum.getPayout_percent(), datum.getDelegateStatistics().getVoting_power(), isVoted));
+            String rewardAmount = String.format("%.5f", StakeCalculator.calculateStake(arkBalance, datum.getPayout_percent(), datum.getDelegateStatistics().getVoting_power(), isVoted));
 
             return new Html("<span>" + rewardAmount + " <label class=\"bold fake-ark-icon\">Ѧ</label></span>");
-        }).setHeader("Daily Rewards");
+        }).setHeader("Daily Rewards")
+                .setAutoWidth(true)
+                .setFlexGrow(1);
 
         delegateGrid.addComponentColumn(datum -> {
             if (arkBalance == null || arkBalance == 0) {
                 return new Span();
             }
-            String rewardAmount = String.format("%.2f", StakeCalculator.calculateStake(arkBalance, datum.getPayout_percent(), datum.getDelegateStatistics().getVoting_power(), isVoted) * 7);
+            String rewardAmount = String.format("%.5f", StakeCalculator.calculateStake(arkBalance, datum.getPayout_percent(), datum.getDelegateStatistics().getVoting_power(), isVoted) * 7);
 
             return new Html("<span>" + rewardAmount + " <label class=\"bold fake-ark-icon\">Ѧ</label></span>");
-        }).setHeader("Weekly Rewards");
+        }).setHeader("Weekly Rewards")
+                .setAutoWidth(true)
+                .setFlexGrow(1);
 
         delegateGrid.addColumn(datum -> datum.getPayout_percent() + "%")
                 .setHeader("Payout");

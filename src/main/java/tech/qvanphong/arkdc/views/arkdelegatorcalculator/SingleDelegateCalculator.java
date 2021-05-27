@@ -57,7 +57,7 @@ public class SingleDelegateCalculator extends PolymerTemplate<SingleDelegateCalc
 
     private ComponentRenderer<FormLayout, Datum> createDesktopDelegateListComboBox() {
         return new ComponentRenderer<>(delegate -> {
-            String formattedWeight = String.format("%.2f", Long.parseLong(delegate.getDelegateStatistics().getVoting_power()) / 100000000F);
+            String formattedWeight = String.format("%.5f", Long.parseLong(delegate.getDelegateStatistics().getVoting_power()) / 100000000F);
 
             Element subRanking = new Html("<sup style='color: var(--lumo-error-color)'>" + delegate.getRank() + "</sup>").getElement();
             Span delegateNameWithRank = new Span(delegate.getName());
@@ -81,7 +81,7 @@ public class SingleDelegateCalculator extends PolymerTemplate<SingleDelegateCalc
 
     private ComponentRenderer<FormLayout, Datum> createMobileDelegateListComboBox() {
         return new ComponentRenderer<>(delegate -> {
-            String formattedWeight = String.format("%.2f", Long.parseLong(delegate.getDelegateStatistics().getVoting_power()) / 100000000F);
+            String formattedWeight = String.format("%.5f", Long.parseLong(delegate.getDelegateStatistics().getVoting_power()) / 100000000F);
             FormLayout formLayout = new FormLayout();
             Span delegateName = new Span(delegate.getName());
             Element subRanking = new Html("<sup style='color: var(--lumo-error-color)'>" + delegate.getRank() + "</sup>").getElement();
