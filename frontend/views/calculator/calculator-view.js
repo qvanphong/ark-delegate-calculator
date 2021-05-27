@@ -173,7 +173,7 @@ class CalculatorView extends PolymerElement {
                     </vaadin-vertical-layout>
                     <vaadin-vertical-layout theme="spacing" style="width: 100%; margin-top: auto;">
                         <i style="flex-shrink: 0; flex-grow: 0; align-self: center; font-size: var(--lumo-font-size-xs)">By Phong#2159 (Discord) with ❤, check out this <a
-                                href="https://github.com/qvanphong/ark-delegate-calculator">github project</a>. <br> 💰 Donate me: AeeNLVJBXsSYkENmFQVQSemX45q71y5fCr (ARK)</i>
+                                href="https://github.com/qvanphong/ark-delegate-calculator">github project</a>.</i>
                     </vaadin-vertical-layout>
                 </vaadin-vertical-layout>
             </vaadin-horizontal-layout>
