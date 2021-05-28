@@ -9,9 +9,9 @@ $_documentContainer.innerHTML = `
 <style>
     /**  Fix iOS height problem **/
     body {
-        min-height: 100vh;
-        min-height: -webkit-fill-available;
-        height: 100%;
+        /*min-height: 100vh;*/
+        /*min-height: -webkit-fill-available;*/
+        /*height: 100%;*/
     }
     html {
         height: -webkit-fill-available;

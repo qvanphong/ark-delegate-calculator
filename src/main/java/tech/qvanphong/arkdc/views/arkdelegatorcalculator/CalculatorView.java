@@ -34,12 +34,16 @@ public class CalculatorView extends PolymerTemplate<CalculatorView.CalculatorVie
     private ArkDelegatesService delegatesService;
     @Id("switch-mode-button")
     private Button switchModeButton;
+    @Id("switch-mode-button-mobile")
+    private Button switchModeMobileButton;
     @Id("is-voted")
     private Checkbox isVoted;
     @Id("ark-balance")
     private NumberField arkBalance;
-    final AllDelegate allDelegate;
-    final SingleDelegateCalculator singleDelegateCalculator;
+    private final AllDelegate allDelegate;
+    private final SingleDelegateCalculator singleDelegateCalculator;
+    private final String SW_TABLE_STR = "Switch to table mode";
+    private final String SW_SINGLE_STR = "Switch to single mode";
 
     @Autowired
     public CalculatorView(ArkDelegatesService delegatesService) {
@@ -50,20 +54,10 @@ public class CalculatorView extends PolymerTemplate<CalculatorView.CalculatorVie
         this.isVoted.addValueChangeListener(e -> valueChangedListener());
 
         switchModeButton.setIcon(VaadinIcon.REFRESH.create());
-        switchModeButton.addClickListener(e -> {
-            Element elementToReplace;
-            if (getElement().getChild(0).equals(allDelegate.getElement())) {
-                elementToReplace = singleDelegateCalculator.getElement();
-                switchModeButton.setText("Switch to table mode");
-            } else {
-                elementToReplace = allDelegate.getElement();
-                switchModeButton.setText("Switch to single mode");
-            }
-            valueChangedListener();
-            getElement().removeAllChildren();
-            getElement().appendChild(elementToReplace);
+        switchModeMobileButton.setIcon(VaadinIcon.REFRESH.create());
+        switchModeButton.addClickListener(e -> switchModeListener());
+        switchModeMobileButton.addClickListener(e -> switchModeListener());
 
-        });
         Element element = allDelegate.getElement();
 
         getElement().appendChild(element);
@@ -80,6 +74,22 @@ public class CalculatorView extends PolymerTemplate<CalculatorView.CalculatorVie
         } else {
             singleDelegateCalculator.updateCalculateResult();
         }
+    }
+
+    private void switchModeListener() {
+        Element elementToReplace;
+        if (getElement().getChild(0).equals(allDelegate.getElement())) {
+            elementToReplace = singleDelegateCalculator.getElement();
+            switchModeButton.setText(SW_TABLE_STR);
+            switchModeMobileButton.setText(SW_TABLE_STR);
+        } else {
+            elementToReplace = allDelegate.getElement();
+            switchModeButton.setText(SW_SINGLE_STR);
+            switchModeMobileButton.setText(SW_SINGLE_STR);
+        }
+        valueChangedListener();
+        getElement().removeAllChildren();
+        getElement().appendChild(elementToReplace);
     }
 
     public interface CalculatorViewModel extends TemplateModel {
